@@ -1,62 +1,85 @@
 package dev.akhtar.ProductService.services;
 
-import dev.akhtar.ProductService.dtos.ProductDto;
+import dev.akhtar.ProductService.exceptions.NoSuchCategoryExistsException;
 import dev.akhtar.ProductService.models.Category;
 import dev.akhtar.ProductService.models.Product;
+import dev.akhtar.ProductService.projections.ProductProjection;
+import dev.akhtar.ProductService.repositories.CategoryRepository;
+import dev.akhtar.ProductService.repositories.ProductRepository;
+import org.hibernate.service.spi.ServiceException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.rmi.ServerException;
-import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-@Service
+@Service("realService")
 public class ProductServiceImpl implements ProductService{
 
-    private final RestTemplate restTemplate;
+    private final ProductRepository productRepository;
 
-    public ProductServiceImpl(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
+    private final CategoryRepository categoryRepository;
+
+    public ProductServiceImpl(ProductRepository productRepository, CategoryRepository categoryRepository) {
+        this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
     public List<Product> getAllProducts() {
-        ProductDto[] productDtos = restTemplate.getForObject("https://fakestoreapi.com/products",ProductDto[].class);
-        List<Product> products= new ArrayList<>();
-
-        for(ProductDto productDtoss:productDtos){
-            products.add(productDtoss.toProduct());
-        }
-        return products;
+        return productRepository.findAll();
     }
 
     @Override
     public Product getSingleProduct(long id) {
-        Optional<ProductDto> productDto = Optional.ofNullable(restTemplate.getForObject("https://fakestoreapi.com/products/" + id, ProductDto.class));
 
-        return productDto.get().toProduct();
-
-//        if(productDto.isPresent()){
-//            return productDto.get().toProduct();
-//        }else{
-//            throw new ServerException("");
-//        }
+       Optional<Product> product= productRepository.findById(id);
+       if(product.isPresent()){
+           return product.get();
+       }else {
+            throw new ServiceException("ID does not exists");
+       }
     }
 
     @Override
     public Product createProduct(String title, double price, String category, String description, String image) {
+        Product product = new Product();
+        product.setTitle(title);
+        product.setPrice(price);
+        product.setImageUrl(image);
+        product.setDescription(description);
 
-        ProductDto productDto = new ProductDto();
-        productDto.setTitle(title);
-        productDto.setPrice(price);
-        productDto.setCategory(category);
-        productDto.setDescription(description);
-        productDto.setImage(image);
+        Optional<Category> category1 = categoryRepository.findByTitle(category);
+        if(category1.isPresent()){
+            product.setCategory(category1.get());
+        }else{
+            throw new NoSuchCategoryExistsException("No Such Category exists");
+        }
 
-        productDto = restTemplate.postForObject("https://fakestoreapi.com/products",productDto, ProductDto.class);
+        product.setCreatedDate(Instant.now());
 
-        return productDto.toProduct();
+        return productRepository.save(product);
+
     }
 
+    @Override
+    public List<Product> searchProduct(String keyword) {
+        if(keyword== null){
+            throw new ServiceException("Bad Request");
+        }
+        Optional<List<Product>> products = productRepository.searchByKeyword(keyword);
+
+        if(products.isPresent() && !products.get().isEmpty()){
+            return products.get();
+        }else{
+            throw new ServiceException("No products found ");
+        }
+    }
+
+    @Override
+    public List<ProductProjection> getTitleAndName(String categoryName) {
+         return productRepository.findIdAndTitleWithGivenCategory(categoryName);
+    }
 }

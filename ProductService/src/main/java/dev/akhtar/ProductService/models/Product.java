@@ -1,5 +1,6 @@
 package dev.akhtar.ProductService.models;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,12 +12,13 @@ import java.sql.Blob;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-//@Entity
-public class Product {
+@Entity
+public class Product extends Base {
 
-    private int id;
     private String title;
     private double price;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "category_fk")
     private Category category;
     private String description;
     private String imageUrl;
