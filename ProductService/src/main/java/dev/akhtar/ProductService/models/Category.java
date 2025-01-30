@@ -3,6 +3,7 @@ package dev.akhtar.ProductService.models;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,7 +21,7 @@ public class Category extends Base {
 
     private String title;
 
-    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY ,mappedBy = "category", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Product> product;
 }

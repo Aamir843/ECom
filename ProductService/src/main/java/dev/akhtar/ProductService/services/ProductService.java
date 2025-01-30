@@ -1,11 +1,8 @@
 package dev.akhtar.ProductService.services;
 
-import dev.akhtar.ProductService.exceptions.NoSuchCategoryExistsException;
 import dev.akhtar.ProductService.models.Product;
 import dev.akhtar.ProductService.projections.ProductProjection;
-import org.hibernate.service.spi.ServiceException;
 
-import java.rmi.ServerException;
 import java.util.List;
 
 public interface ProductService {

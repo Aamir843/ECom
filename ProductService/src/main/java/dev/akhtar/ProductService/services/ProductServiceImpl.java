@@ -7,10 +7,8 @@ import dev.akhtar.ProductService.projections.ProductProjection;
 import dev.akhtar.ProductService.repositories.CategoryRepository;
 import dev.akhtar.ProductService.repositories.ProductRepository;
 import org.hibernate.service.spi.ServiceException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.rmi.ServerException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -82,4 +80,5 @@ public class ProductServiceImpl implements ProductService{
     public List<ProductProjection> getTitleAndName(String categoryName) {
          return productRepository.findIdAndTitleWithGivenCategory(categoryName);
     }
+
 }

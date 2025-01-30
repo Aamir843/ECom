@@ -5,9 +5,11 @@ import dev.akhtar.ProductService.models.Product;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
-public class ProductDto {
+public class ProductDto implements Serializable {
     private double price;
     private String title;
     private String description;

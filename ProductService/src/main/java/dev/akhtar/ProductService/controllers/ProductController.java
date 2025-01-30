@@ -1,17 +1,14 @@
 package dev.akhtar.ProductService.controllers;
 
 import dev.akhtar.ProductService.dtos.CreateProductRequestDto;
-import dev.akhtar.ProductService.exceptions.NoSuchCategoryExistsException;
 import dev.akhtar.ProductService.models.Product;
 import dev.akhtar.ProductService.projections.ProductProjection;
 import dev.akhtar.ProductService.services.ProductService;
-import org.hibernate.service.spi.ServiceException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.rmi.ServerException;
 import java.util.List;
 
 @RestController
